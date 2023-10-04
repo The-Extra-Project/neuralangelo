@@ -1,0 +1,66 @@
+FROM --platform=arm64 ubuntu:20.04 as base
+ARG DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
+
+## Installation of the neuralangelo and colmap dependencies: 
+# colmap dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    tzdata \
+    cmake \
+    ninja-build \
+    build-essential \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
+    libboost-test-dev \
+    libeigen3-dev \
+    libflann-dev \
+    libfreeimage-dev \
+    libmetis-dev \
+    libgoogle-glog-dev \
+    libgflags-dev \
+    libsqlite3-dev \
+    libglew-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev \
+    libceres-dev \
+    build-essential \
+    bzip2 \
+    ca-certificates \
+    cmake \
+    curl \
+    ffmpeg \
+    g++ \
+    git \
+    libx264-dev \
+    tmux \
+    wget \
+    python3-pip \
+    python3
+    
+RUN pip install --upgrade pip 
+
+WORKDIR /app/neuralangelo
+
+## setting up neuralangelo within the library
+RUN git clone --recursive https://github.com/NVlabs/neuralangelo.git && \
+ cd /app/neuralangelo/neuralangelo && \
+ cd third_party/colmap && \
+ mkdir build && \
+cd build && \
+cmake ../ -GNinja && \
+ninja && \
+sudo ninja install 
+
+## setting up the installation of python packages and transferring to the container
+
+RUN export SEQUENCE=lego && \
+export PATH_TO_VIDEO=lego.mp4 && \
+export DOWNSAMPLE_RATE=2 && \
+export SCENE_TYPE=object 
+
+# Running the demo scenario for the testing.
+
+CMD [ "/bin/bash" , "-c" , " /app/neuralangelo/neuralangelo/projects/neuralangelo/scripts/preprocess.sh", ${SEQUENCE},  ${PATH_TO_VIDEO},  ${DOWNSAMPLE_RATE} ${SCENE_TYPE} ]
