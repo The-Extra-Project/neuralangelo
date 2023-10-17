@@ -1,4 +1,4 @@
-FROM --platform=arm64 ubuntu:20.04 as base
+FROM  ubuntu:20.04 as base
 ARG DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 
 ## Installation of the neuralangelo and colmap dependencies: 
@@ -46,13 +46,13 @@ WORKDIR /app/neuralangelo
 
 ## setting up neuralangelo within the library
 RUN git clone --recursive https://github.com/NVlabs/neuralangelo.git && \
- cd /app/neuralangelo/neuralangelo && \
- cd third_party/colmap && \
- mkdir build && \
+cd /app/neuralangelo/neuralangelo && \
+cd third_party/colmap && \
+mkdir build && \
 cd build && \
 cmake ../ -GNinja && \
 ninja && \
-sudo ninja install 
+ninja install 
 
 ## setting up the installation of python packages and transferring to the container
 
@@ -62,5 +62,4 @@ export DOWNSAMPLE_RATE=2 && \
 export SCENE_TYPE=object 
 
 # Running the demo scenario for the testing.
-
-CMD [ "/bin/bash" , "-c" , " /app/neuralangelo/neuralangelo/projects/neuralangelo/scripts/preprocess.sh", ${SEQUENCE},  ${PATH_TO_VIDEO},  ${DOWNSAMPLE_RATE} ${SCENE_TYPE} ]
+CMD [ "/app/neuralangelo/neuralangelo/projects/neuralangelo/scripts/preprocess.sh", ${SEQUENCE},  ${PATH_TO_VIDEO},  ${DOWNSAMPLE_RATE} ${SCENE_TYPE} ]
