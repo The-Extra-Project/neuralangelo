@@ -38,19 +38,50 @@ RUN apt-get update && apt-get install -y \
     tmux \
     wget \
     python3-pip \
-    python3
+    python3 
     
 RUN pip install --upgrade pip 
 
+## setting up the installation of the conda 
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && bash miniconda.sh -b -p /opt/conda
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+
 WORKDIR /app/neuralangelo
 
-## setting up colmap and the library
-RUN git clone --recursive https://github.com/NVlabs/neuralangelo.git && \
+## setting up colmap and overall repository
+RUN git clone --recursive https://github.com/The-Extra-Project/neuralangelo.git && \
+git checkout -b 
 cd ./neuralangelo/third_party/colmap && \
 mkdir build && \
 cd build && \
 cmake ../ -GNinja && \
 ninja && \
-ninja install &&
-cd ../
-## setting up the installation of python packages and transferring to the container
+ninja install 
+
+##  now running the image preprocessing step from the colmap container 
+
+## installing docker (in docker runtime ;) ) from the commands on the docs.docker.com
+## this needs to 
+
+# Add Docker's official GPG key:
+RUN  apt-get update  && \
+ apt-get install -y  ca-certificates curl gnupg && \
+ install -m 0755 -d /etc/apt/keyrings && \
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg |  gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+ chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+RUN echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" |  tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+ apt-get -y update &&  apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+
+WORKDIR /app/neuralangelo/neuralangelo
+
+RUN docker compose build colmap
+
+RUN docker compose run colmap
+
+
+

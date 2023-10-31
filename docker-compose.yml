@@ -4,3 +4,7 @@ services:
     build: 
       context: ./
       dockerfile: docker/Dockerfile-colmap
+  complete-pipeline:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile.unified 
