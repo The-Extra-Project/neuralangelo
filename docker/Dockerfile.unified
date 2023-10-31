@@ -44,22 +44,13 @@ RUN pip install --upgrade pip
 
 WORKDIR /app/neuralangelo
 
-## setting up neuralangelo within the library
+## setting up colmap and the library
 RUN git clone --recursive https://github.com/NVlabs/neuralangelo.git && \
-cd /app/neuralangelo/neuralangelo && \
-cd third_party/colmap && \
+cd ./neuralangelo/third_party/colmap && \
 mkdir build && \
 cd build && \
 cmake ../ -GNinja && \
 ninja && \
-ninja install 
-
+ninja install &&
+cd ../
 ## setting up the installation of python packages and transferring to the container
-
-RUN export SEQUENCE=lego && \
-export PATH_TO_VIDEO=lego.mp4 && \
-export DOWNSAMPLE_RATE=2 && \
-export SCENE_TYPE=object 
-
-# Running the demo scenario for the testing.
-CMD [ "/app/neuralangelo/neuralangelo/projects/neuralangelo/scripts/preprocess.sh", ${SEQUENCE},  ${PATH_TO_VIDEO},  ${DOWNSAMPLE_RATE} ${SCENE_TYPE} ]
