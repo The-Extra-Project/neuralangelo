@@ -33,3 +33,5 @@ termcolor
 tqdm
 trimesh
 wandb
+streamlit
+python-dotenv
