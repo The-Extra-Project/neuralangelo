@@ -4,6 +4,10 @@ services:
     build: 
       context: ./
       dockerfile: docker/Dockerfile-colmap
+  neuralangelo:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile-neuralangelo
   complete-pipeline:
     build:
       context: ./

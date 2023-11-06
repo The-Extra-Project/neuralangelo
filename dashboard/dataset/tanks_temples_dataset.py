@@ -39,6 +39,7 @@ import argparse
 import zipfile
 import hashlib
 import requests
+from subprocess import check_call
 if (sys.version_info > (3, 0)):
     pversion = 3
     from urllib.request import Request, urlopen
@@ -359,7 +360,18 @@ training_list = [
         'Barn', 'Caterpillar', 'Church', 'Courthouse', 'Ignatius',
         'Meetingroom', 'Truck'
     ]
-
+def download_allignment_data(driveId):
+    """
+    gets the allignment data from the training the neuralangelo for the given model.
+    driveId: is the unique notifier for the training data stored on the google drive
+    
+    
+    """
+    try:
+        check_call(["gdown", driveId])
+    except Exception as e:
+        print("exception generated" + e)
+    
 
 if __name__ == "__main__":
     

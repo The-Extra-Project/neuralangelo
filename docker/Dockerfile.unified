@@ -1,4 +1,6 @@
-FROM  ubuntu:22.04 as base
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as buildcolmap
+
+
 ARG DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 
 ## Installation of the neuralangelo and colmap dependencies: 
@@ -38,48 +40,67 @@ RUN apt-get update && apt-get install -y \
     tmux \
     wget \
     python3-pip \
-    python3 
-    
-RUN pip install --upgrade pip 
+    python3 \
+    xvfb
 
+RUN pip install --upgrade pip 
 
 WORKDIR /app/
 ENV CUDA_ARCHITECTURES=70,72,75,80,86
 
-## setting up colmap and overall repository
+## setting up neuralangelo/colmap and overall repository:
+
 RUN git clone --recursive https://github.com/The-Extra-Project/neuralangelo.git && \
 cd ./neuralangelo && \
 git checkout -b Dhruv/resolve-docker-build && \
 cd ./third_party/colmap && \
 mkdir build && \
 cd build && \
-cmake ../ -GNinja -DCMAKE_CUDA_ARCHITECTURES=all && \
+cmake ../ -GNinja -DCMAKE_CUDA_ARCHITECTURES=86 && \
 ninja && \
 ninja install 
 
-## again installing cmake because of the issues regarding the tiny-cuda-nn installation 
-##(and ubuntu apt installation is not of latest version)
-
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-Linux-x86_64.sh -q -O /tmp/cmake-install.sh \
-&& chmod u+x /tmp/cmake-install.sh \
-      && mkdir /opt/cmake-3.24.1 \
-      && /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.24.1 \
-    && rm /tmp/cmake-install.sh \
-      && ln -s /opt/cmake-3.24.1/bin/* /usr/local/bin
 
 FROM nvidia/cuda:12.2.2-devel-ubuntu22.04 as build_cuda
 ## installing the tiny-cuda-nn which is not being setup by the conda env. 
-COPY --from=base / / 
+COPY --from=buildcolmap /app/ /app/ 
+
+
 ARG TCNN_CUDA_ARCHITECTURES=90;89;86;80;75;70;61;52
 RUN apt-get update && apt-get install -y git python3-pip 
 
-WORKDIR /app/neuralangelo
-RUN pip3 install torch torchvision torchaudio -f https://download.pytorch.org/whl/cu111/torch_stable.html
+WORKDIR /
+
+## reference from internet, installation of tiny-cuda-nn
+
+RUN apt-get update && apt-get install -y  cmake build-essential
+
+RUN git clone https://github.com/NVlabs/tiny-cuda-nn.git --recursive
+
+# Build and install tiny-cuda-nn
+WORKDIR /tiny-cuda-nn/
+RUN cmake -DTCNN_BUILD_BENCHMARK=OFF -DTCNN_BUILD_EXAMPLES=OFF -B build
+RUN cmake --build build --config RelWithDebInfo -j $(nproc) --verbose
+RUN cmake --install build
+
+# Set environment variable for tiny-cuda-nn
+ENV TINYCUDANN_DIR /usr/local/tiny-cuda-nn
+RUN echo "export TINYCUDANN_DIR=/usr/local/tiny-cuda-nn" >> /etc/profile
+
+WORKDIR /app/neuralangelo/
+
+RUN pip install torch 
 RUN pip install  -r requirements.txt
+
 
 FROM build_cuda as run
 
 COPY --from=build_cuda /app/neuralangelo /app/neuralangelo
+
 WORKDIR  /app/neuralangelo
 
-ENTRYPOINT ["./projects/neuralangelo/scripts/image_reconstruction.sh"]
+ARG SEQUENCE_NAME="Barn"
+ARG PATH_TO_VIDEO="./datasets/videos/Barn.mp4"
+
+RUN chmod +x run.sh
+ENTRYPOINT ["./run.sh", "Barn"] 

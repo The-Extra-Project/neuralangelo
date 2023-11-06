@@ -53,9 +53,9 @@ WORKDIR /app/neuralangelo
 
 ## copying the dataset video along with the code to run the initial image surface reconstruction process
 
-COPY ../datas/  ./datas/
+COPY ../datasets/  ./datasets/
 COPY ../projects/ ./projects/
-
+COPY ./run.sh ./run.sh
 RUN chmod 777 ./projects/neuralangelo/scripts/image_reconstruction.sh
 
 FROM base as preprocessing

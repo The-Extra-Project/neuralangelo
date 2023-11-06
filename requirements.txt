@@ -1,6 +1,5 @@
 addict
 gdown
-git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 gpustat
 icecream
 imageio-ffmpeg
@@ -12,6 +11,7 @@ lpips
 matplotlib
 mediapy
 nvidia-ml-py3
+
 open3d
 opencv-python-headless
 OpenEXR
@@ -35,3 +35,6 @@ trimesh
 wandb
 streamlit
 python-dotenv
+open3d
+numpy
+matplotlib

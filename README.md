@@ -1,5 +1,5 @@
 # Neuralangelo
-This is the official implementation of **Neuralangelo: High-Fidelity Neural Surface Reconstruction**.
+This is the mofidied implementation of original **Neuralangelo: High-Fidelity Neural Surface Reconstruction**.
 
 [Zhaoshuo Li](https://mli0603.github.io/),
 [Thomas Müller](https://tom94.net/),
@@ -20,18 +20,21 @@ For business inquiries, please submit the [NVIDIA research licensing form](https
 --------------------------------------
 
 ## Installation
-We offer two ways to setup the environment:
-1. We provide prebuilt Docker images, where
-    - `docker.io/chenhsuanlin/colmap:3.8` is for running COLMAP and the data preprocessing scripts. This includes the prebuilt COLMAP library (CUDA-supported).
-    - `docker.io/chenhsuanlin/neuralangelo:23.04-py3` is for running the main Neuralangelo pipeline.
 
-    The corresponding Dockerfiles can be found in the `docker` directory.
-2. The conda environment for Neuralangelo. Install the dependencies and activate the environment `neuralangelo` with
-    ```bash
-    conda env create --file neuralangelo.yaml
-    conda activate neuralangelo
-    ```
-For COLMAP, alternative installation options are also available on the [COLMAP website](https://colmap.github.io/).
+
+1. Build the Dockerfile-unified image which runs the preprocessing commands
+
+```
+docker compose build complete-pipeline
+```
+
+2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ 
+
+3. then run the ./run.sh within the Dockerfile.unified by passing:
+    -  the name of the dataset and the scene_type (indoor/outdoor/output)
+    - name of the output ply file.
+
+
 
 --------------------------------------
 
