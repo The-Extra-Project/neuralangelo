@@ -18,11 +18,12 @@ To capture your own data, we recommend using a high shutter speed to avoid motio
 ### Preprocessing
 First, set some environment variables:
 ```bash
-SEQUENCE=lego
-PATH_TO_VIDEO=lego.mp4
+SEQUENCE=Barn
+PATH_TO_VIDEO=Barn.jpg
 DOWNSAMPLE_RATE=2
 SCENE_TYPE=object
 ```
+
 where
 - `SEQUENCE`: your custom name for the video sequence.
 - `PATH_TO_VIDEO`: absolute/relative path to your video.

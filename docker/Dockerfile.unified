@@ -1,10 +1,9 @@
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as buildcolmap
 
-
 ARG DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
-
 ## Installation of the neuralangelo and colmap dependencies: 
 # colmap dependencies
+WORKDIR /
 RUN apt-get update && apt-get install -y \
     git \
     tzdata \
@@ -41,12 +40,13 @@ RUN apt-get update && apt-get install -y \
     wget \
     python3-pip \
     python3 \
-    xvfb
+    xvfb \
+    cmake \
+    build-essential
 
 RUN pip install --upgrade pip 
 
 WORKDIR /app/
-ENV CUDA_ARCHITECTURES=70,72,75,80,86
 
 ## setting up neuralangelo/colmap and overall repository:
 
@@ -61,46 +61,33 @@ ninja && \
 ninja install 
 
 
-FROM nvidia/cuda:12.2.2-devel-ubuntu22.04 as build_cuda
-## installing the tiny-cuda-nn which is not being setup by the conda env. 
-COPY --from=buildcolmap /app/ /app/ 
+
+FROM buildcolmap as run_cuda
 
 
-ARG TCNN_CUDA_ARCHITECTURES=90;89;86;80;75;70;61;52
-RUN apt-get update && apt-get install -y git python3-pip 
+COPY --from=buildcolmap /usr /usr
 
-WORKDIR /
-
-## reference from internet, installation of tiny-cuda-nn
-
-RUN apt-get update && apt-get install -y  cmake build-essential
-
-RUN git clone https://github.com/NVlabs/tiny-cuda-nn.git --recursive
-
-# Build and install tiny-cuda-nn
-WORKDIR /tiny-cuda-nn/
-RUN cmake -DTCNN_BUILD_BENCHMARK=OFF -DTCNN_BUILD_EXAMPLES=OFF -B build
-RUN cmake --build build --config RelWithDebInfo -j $(nproc) --verbose
-RUN cmake --install build
-
-# Set environment variable for tiny-cuda-nn
-ENV TINYCUDANN_DIR /usr/local/tiny-cuda-nn
-RUN echo "export TINYCUDANN_DIR=/usr/local/tiny-cuda-nn" >> /etc/profile
+COPY --from=buildcolmap /app/ /app/
 
 WORKDIR /app/neuralangelo/
 
-RUN pip install torch 
-RUN pip install  -r requirements.txt
+
+ENV TCNN_CUDA_ARCHITECTURES=
+ENV FORCE_CUDA=1
+ENV TCNN_CUDA_ARCHITECTURES=70,72,75,80,86
+
+ENV CUDA_HOME=/usr/local/cuda
+RUN pip install torch --index-url https://download.pytorch.org/whl/cu118 && pip install  -r requirements.txt
+
+RUN pip install pynvml
+FROM run_cuda as run
+
+COPY --from=run_cuda /app/ /app/
+COPY --from=run_cuda /usr/ /usr/
 
 
-FROM build_cuda as run
-
-COPY --from=build_cuda /app/neuralangelo /app/neuralangelo
 
 WORKDIR  /app/neuralangelo
 
-ARG SEQUENCE_NAME="Barn"
-ARG PATH_TO_VIDEO="./datasets/videos/Barn.mp4"
-
 RUN chmod +x run.sh
-ENTRYPOINT ["./run.sh", "Barn"] 
+RUN ./run.shENTRYPOINT ["./run.sh"] 

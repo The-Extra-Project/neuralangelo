@@ -30,10 +30,10 @@ docker compose build complete-pipeline
 
 2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ 
 
-3. then run the ./run.sh within the Dockerfile.unified by passing:
-    -  the name of the dataset and the scene_type (indoor/outdoor/output)
-    - name of the output ply file.
+3. install the bacalau and streamlit localy.
 
+4. Then setup the streamlit application: 
+    - streamlit run dashboard/app.py    
 
 
 --------------------------------------
