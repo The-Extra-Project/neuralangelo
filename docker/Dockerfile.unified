@@ -60,19 +60,17 @@ cmake ../ -GNinja -DCMAKE_CUDA_ARCHITECTURES=86 && \
 ninja && \
 ninja install 
 
-
+COPY ./datasets/ ./app/neuralangelo/datasets/
 
 FROM buildcolmap as run_cuda
 
 
-COPY --from=buildcolmap /usr /usr
+COPY --from=buildcolmap /usr/ /usr/
 
 COPY --from=buildcolmap /app/ /app/
 
 WORKDIR /app/neuralangelo/
 
-
-ENV TCNN_CUDA_ARCHITECTURES=
 ENV FORCE_CUDA=1
 ENV TCNN_CUDA_ARCHITECTURES=70,72,75,80,86
 
@@ -80,14 +78,15 @@ ENV CUDA_HOME=/usr/local/cuda
 RUN pip install torch --index-url https://download.pytorch.org/whl/cu118 && pip install  -r requirements.txt
 
 RUN pip install pynvml
+
 FROM run_cuda as run
 
 COPY --from=run_cuda /app/ /app/
-COPY --from=run_cuda /usr/ /usr/
-
-
 
 WORKDIR  /app/neuralangelo
 
-RUN chmod +x run.sh
-RUN ./run.shENTRYPOINT ["./run.sh"] 
+ARG SEQ="Barn"
+ARG SCENE_TYPE="outside"
+
+
+ENTRYPOINT ["./run.sh", $SEQ, $SCENE_TYPE] 

@@ -1,5 +1,11 @@
-# Neuralangelo
-This is the mofidied implementation of original **Neuralangelo: High-Fidelity Neural Surface Reconstruction**.
+# Neuralangelo-decentralised 
+This is the mofidied implementation of original **Neuralangelo** paper with significant changes.
+    - possiblity to run on various real-life datasets like [tanks-and-temples]().
+
+
+
+
+## Credits:
 
 [Zhaoshuo Li](https://mli0603.github.io/),
 [Thomas Müller](https://tom94.net/),
@@ -12,10 +18,12 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2023
 
 ### [Project page](https://research.nvidia.com/labs/dir/neuralangelo/) | [Paper](https://arxiv.org/abs/2306.03092/) | [Colab notebook](https://colab.research.google.com/drive/13u8DX9BNzQwiyPPCB7_4DbSxiQ5-_nGF)
 
-<img src="assets/teaser.gif">
-
 The code is built upon the Imaginaire library from the Deep Imagination Research Group at NVIDIA.  
-For business inquiries, please submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
+
+
+
+
+This implementation is to be solely used for running the compute operations for non commercial demonstration purposes only, For business inquiries, please submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
 
 --------------------------------------
 
@@ -25,11 +33,73 @@ For business inquiries, please submit the [NVIDIA research licensing form](https
 1. Build the Dockerfile-unified image which runs the preprocessing commands
 
 ```
-docker compose build complete-pipeline
+> docker compose build up -d 
 ```
 
-2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ 
+NOTE: the build for neuralangelo takes painstakingly long time due to the dependencies like tiny-cuda-nn. so try to have significant amount of the compute requirements in order to get the 
 
+
+
+2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ as following structure
+
+```
+./tanks_and_temples/
+├── Barn
+│   ├── Barn.json
+│   ├── Barn.ply
+│   ├── Barn_COLMAP.ply
+│   ├── Barn_COLMAP_SfM.log
+│   ├── Barn_mapping_reference.txt
+│   ├── Barn_trans.txt
+│   ├── database.db
+│   ├── images_raw
+│   ├── pinhole_dict.json
+│   └── sparse
+├── Caterpillar
+│   ├── Caterpillar.json
+│   ├── Caterpillar.ply
+│   ├── Caterpillar_COLMAP.ply
+│   ├── Caterpillar_COLMAP_SfM.log
+│   ├── Caterpillar_mapping_reference.txt
+│   └── Caterpillar_trans.txt
+├── Church
+│   ├── Church.json
+│   ├── Church.ply
+│   ├── Church_COLMAP.ply
+│   ├── Church_COLMAP_SfM.log
+│   ├── Church_COLMAP_SfM_ff.log
+│   ├── Church_mapping_reference.txt
+│   └── Church_trans.txt
+├── Courthouse
+│   ├── Courthouse.json
+│   ├── Courthouse.ply
+│   ├── Courthouse_COLMAP.ply
+│   ├── Courthouse_COLMAP_SfM.log
+│   ├── Courthouse_COLMAP_SfM_ff.log
+│   ├── Courthouse_mapping_reference.txt
+│   └── Courthouse_trans.txt
+├── Ignatius
+│   ├── Ignatius.json
+│   ├── Ignatius.ply
+│   ├── Ignatius_COLMAP.ply
+│   ├── Ignatius_COLMAP_SfM.log
+│   ├── Ignatius_mapping_reference.txt
+│   └── Ignatius_trans.txt
+├── Meetingroom
+│   ├── Meetingroom.json
+│   ├── Meetingroom.ply
+│   ├── Meetingroom_COLMAP.ply
+│   ├── Meetingroom_COLMAP_SfM.log
+│   ├── Meetingroom_mapping_reference.txt
+│   └── Meetingroom_trans.txt
+├── Truck
+│   ├── Truck.json
+│   ├── Truck.ply
+│   ├── Truck_COLMAP.ply
+│   ├── Truck_COLMAP_SfM.log
+│   ├── Truck_mapping_reference.txt
+│   └── Truck_trans.txt
+```
 3. install the bacalau and streamlit localy.
 
 4. Then setup the streamlit application: 

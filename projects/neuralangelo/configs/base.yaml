@@ -128,7 +128,7 @@ optim:
 
 data:
     type: projects.nerf.datasets.nerf_blender
-    root: datasets/nerf-synthetic/lego
+    root: datasets/nerf-synthetic/
     use_multi_epoch_loader: True
     num_workers: 4
     preload: True

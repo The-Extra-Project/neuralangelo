@@ -48,19 +48,29 @@ RUN pip install \
     pyyaml \
     trimesh
 
+RUN rm -rf ./colmap/
 
 WORKDIR /app/neuralangelo
 
 ## copying the dataset video along with the code to run the initial image surface reconstruction process
 
-COPY ../datasets/  ./datasets/
+#COPY ../datasets/  ./datasets/
 COPY ../projects/ ./projects/
-COPY ./run.sh ./run.sh
-RUN chmod 777 ./projects/neuralangelo/scripts/image_reconstruction.sh
+COPY ../third_party/colmap/scripts ./third_party/colmap/scripts
+
+COPY ../scripts/ ./scripts/
+
+COPY ../datasets/videos ./datasets/videos/
+COPY ../datasets/tanks_and_temples/Barn/ ./datasets/tanks_and_temples/Barn/
+
+RUN chmod +x ./scripts/run_initial_preprocessing.sh
 
 FROM base as preprocessing
 
 COPY --from=base /app/neuralangelo /app/neuralangelo
+WORKDIR /
+ARG SEQ="Barn"
+ARG DOWNSAMPLE_RATE=5
+ARG SCENE_TYPE=outdoor
 
-ENTRYPOINT ["/app/neuralangelo/projects/neuralangelo/scripts/image_reconstruction.sh"]
-
+ENTRYPOINT [ "/app/neuralangelo/scripts/run_initial_preprocessing.sh"]

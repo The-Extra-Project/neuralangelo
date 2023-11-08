@@ -12,3 +12,6 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile.unified 
+      args:
+        SEQ: Barn.mp4
+        SCENE_TYPE: outside
