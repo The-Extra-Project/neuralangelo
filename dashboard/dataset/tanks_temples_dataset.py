@@ -39,7 +39,6 @@ import argparse
 import zipfile
 import hashlib
 import requests
-from subprocess import check_call
 if (sys.version_info > (3, 0)):
     pversion = 3
     from urllib.request import Request, urlopen
@@ -348,7 +347,6 @@ def print_status(sequences, modality, pathname, intermediate_list,
                  modality == '') else 'n')
             print(line_new)
 
-
 intermediate_list = [
         'Family', 'Francis', 'Horse', 'Lighthouse', 'M60', 'Panther',
         'Playground', 'Train'
@@ -360,21 +358,12 @@ training_list = [
         'Barn', 'Caterpillar', 'Church', 'Courthouse', 'Ignatius',
         'Meetingroom', 'Truck'
     ]
-def download_allignment_data(driveId):
-    """
-    gets the allignment data from the training the neuralangelo for the given model.
-    driveId: is the unique notifier for the training data stored on the google drive
-    
-    
-    """
-    try:
-        check_call(["gdown", driveId])
-    except Exception as e:
-        print("exception generated" + e)
-    
+
+
+
 
 if __name__ == "__main__":
-    
+
     args = parser.parse_args()
     sequences = args.group
     calc_md5 = args.calc_md5
