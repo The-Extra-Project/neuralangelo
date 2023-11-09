@@ -27,18 +27,14 @@ This implementation is to be solely used for running the compute operations for 
 
 --------------------------------------
 
-## Installation
+## Setup
 
 
-1. Build the Dockerfile-unified image which runs the preprocessing commands
+1. Build both the docker images which runs the preprocessing commands.
 
 ```
 > docker compose build up -d 
 ```
-
-NOTE: the build for neuralangelo takes painstakingly long time due to the dependencies like tiny-cuda-nn. so try to have significant amount of the compute requirements in order to get the 
-
-
 
 2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ as following structure
 
@@ -100,7 +96,7 @@ NOTE: the build for neuralangelo takes painstakingly long time due to the depend
 │   ├── Truck_mapping_reference.txt
 │   └── Truck_trans.txt
 ```
-3. install the bacalau and streamlit localy.
+3. install the bacalau and streamlit locally
 
 4. Then setup the streamlit application: 
     - streamlit run dashboard/app.py    

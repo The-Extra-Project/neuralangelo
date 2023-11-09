@@ -64,8 +64,5 @@ FROM base as preprocessing
 
 COPY --from=base /app/neuralangelo /app/neuralangelo
 WORKDIR /
-ARG SEQ="Barn"
-ARG DOWNSAMPLE_RATE=5
-ARG SCENE_TYPE=outdoor
 
-ENTRYPOINT [ "/app/neuralangelo/scripts/run_initial_preprocessing.sh"]
+#ENTRYPOINT [ "/app/neuralangelo/scripts/run_initial_preprocessing.sh"]

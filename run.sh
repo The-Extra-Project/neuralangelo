@@ -11,13 +11,13 @@ DOWNSAMPLE_RATE=2
 SCENE_TYPE=${2}
 echo "running the initial run_ffmpeg to sequence the photos from videos"
 
-bash ./projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
+bash app/neuralangelo/projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
 
 DATA_PATH=./datasets/${SEQUENCE}_ds${DOWNSAMPLE_RATE}
 
 if [ ! -d "./datasets/tanks_and_temples/" ]; then
 
-mkdir "./datasets/tanks_and_temples/"
+mkdir "app/datasets/tanks_and_temples/"
 
 fi
 

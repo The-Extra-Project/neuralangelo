@@ -27,6 +27,7 @@ RUN pip install --upgrade \
     pre-commit
 
 # Install base Python libraries for Imaginaire
+
 COPY ../requirements.txt requirements.txt
 ARG FORCE_CUDA=1
 ARG TCNN_CUDA_ARCHITECTURES=70,72,75,80,86

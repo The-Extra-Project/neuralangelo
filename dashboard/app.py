@@ -7,9 +7,9 @@ from subprocess import Popen, PIPE
 import open3d as o3d
 import asyncio
 
-async def call_subprocess_command(command):
+def call_subprocess_command(command):
     try:
-        command = await asyncio.run(asyncio.create_subprocess_shell(command, stdout=PIPE, shell=True))        
+        command = Popen(command, stdout=PIPE, shell=True)      
         output, error = command.communicate() 
         if output:
             st.success(output.decode('utf-8'))
@@ -18,23 +18,6 @@ async def call_subprocess_command(command):
         st.success(f"output command: {output.decode('utf-8')}")
     except Exception as ex:        
         st.error(f"exception occured at {command.stderr}")
-
-
-def run_bacalhau_job(sequence_name, downsample_rate, raw_images_id):
-    """
-    runs the combined docker container on bacalau
-    sequence_name: its the actual name of the video that you want to develop.
-    
-    """
-    try:
-        command = Popen("bacalau docker run devextralabs/neuralangelo:0.1 " + sequence_name  + " " + downsample_rate + " " + raw_images_id , stdout=PIPE, shell=True)        
-        output, error = command.communicate() 
-        if output:
-            st.success(output.decode('utf-8'))
-        elif error:
-            st.error(error.decode('utf-8'))
-    except Exception as e:
-        print(e)
     
     
 def main():
@@ -58,6 +41,10 @@ def main():
     submitted = form.form_submit_button("colmap calibration/analysis")
     training_model = form.form_submit_button("neuralangelo training")
     mesh_generation = form.form_submit_button("mesh generation")    
+    allignment_images = form.form_submit_button("colmap image allignment")
+    
+    
+    
     
     current_dir =  Path(__file__).parent
     parent_dir =  (current_dir / '../' ).resolve()
@@ -67,12 +54,10 @@ def main():
     
     
     ##TODO: currently drive API's are rate limited so we've transferred already the trainingdata / videos for barn/family in the datasets/ folder 
-    while submitted:
+    if submitted:
         ## downloading the necessary datasets
-        st.header("downloading the training dataset and transferring to the requisite portal")
-        #call_subprocess_command('python tanks_temples_dataset.py' + ' --modality video ' + ' --group both')
-        ## insure before that the container is running in detached mode.
-        #call_subprocess_command('docker exec -it neuralangelo-colmap mkdir ./datasets ')        
+        st.text("downloading the training dataset and transferring the training data")
+        call_subprocess_command('docker run neuralangelo-colmap mkdir ./datasets ')        
         if (os.path.exists(os.path.join(__file__ , 'training.zip'))):
             asyncio.run(call_subprocess_command('gdown 1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE && 7z x trainingdata.zip -o tanks_and_temples'))
         #call_subprocess_command('docker cp ./tanks_and_temples neuralangelo-colmap:/datasets/tanks_and_temples/')
@@ -159,6 +144,11 @@ def run_mesh_extraction(group_name, output_name, mesh):
         st.error(f"exception {error}")
     
 def run_visualization(mesh_name: str):
+    """
+    mesh_name: its the output ply file generated after running the output
+    
+    """
+
     ply_point_cloud = o3d.io.read_point_cloud(mesh_name)
     o3d.visualization([ply_point_cloud],
                       zoom=0.3412,
