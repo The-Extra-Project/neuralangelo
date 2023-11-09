@@ -1,16 +1,15 @@
 import streamlit as st
 from dataset.tanks_temples_dataset import intermediate_list , advanced_list, training_list, id_download_dict
-from dotenv import  set_key
 from subprocess import check_call
 from pathlib import Path
-import time
 import os
 from subprocess import Popen, PIPE
 import open3d as o3d
+import asyncio
 
-def call_subprocess_command(command):
+async def call_subprocess_command(command):
     try:
-        command = Popen(command, stdout=PIPE, shell=True)        
+        command = await asyncio.run(asyncio.create_subprocess_shell(command, stdout=PIPE, shell=True))        
         output, error = command.communicate() 
         if output:
             st.success(output.decode('utf-8'))
@@ -23,7 +22,9 @@ def call_subprocess_command(command):
 
 def run_bacalhau_job(sequence_name, downsample_rate, raw_images_id):
     """
-    runs the deployed containers.
+    runs the combined docker container on bacalau
+    sequence_name: its the actual name of the video that you want to develop.
+    
     """
     try:
         command = Popen("bacalau docker run devextralabs/neuralangelo:0.1 " + sequence_name  + " " + downsample_rate + " " + raw_images_id , stdout=PIPE, shell=True)        
@@ -47,29 +48,43 @@ def main():
         dataset_list.append(key)
         
     form = st.form("neuralangelo dataset params")
+    
     scene_type = form.selectbox("scene type", options=["outdoor","indoor","object"])
     value = form.selectbox("dataset category", options= dataset_list)
     downsampling = form.text_input(label="number of frames that you want to resample", value=2)
+    
     mesh_name = 'output_' + value
+    
     submitted = form.form_submit_button("colmap calibration/analysis")
     training_model = form.form_submit_button("neuralangelo training")
     mesh_generation = form.form_submit_button("mesh generation")    
+    
     current_dir =  Path(__file__).parent
     parent_dir =  (current_dir / '../' ).resolve()
-    datasets_dir = ( parent_dir / './datasets').resolve()
-    videos_dir = (datasets_dir/ './videos').resolve()
+    datasets_dir = ( parent_dir / 'datasets/').resolve()
+    videos_dir = (datasets_dir/ 'videos/').resolve()
     
     
     
     ##TODO: currently drive API's are rate limited so we've transferred already the trainingdata / videos for barn/family in the datasets/ folder 
-    if submitted:
-        st.write("colmap image reconstruction started")
+    while submitted:
+        ## downloading the necessary datasets
+        st.header("downloading the training dataset and transferring to the requisite portal")
+        #call_subprocess_command('python tanks_temples_dataset.py' + ' --modality video ' + ' --group both')
+        ## insure before that the container is running in detached mode.
+        #call_subprocess_command('docker exec -it neuralangelo-colmap mkdir ./datasets ')        
+        if (os.path.exists(os.path.join(__file__ , 'training.zip'))):
+            asyncio.run(call_subprocess_command('gdown 1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE && 7z x trainingdata.zip -o tanks_and_temples'))
+        #call_subprocess_command('docker cp ./tanks_and_temples neuralangelo-colmap:/datasets/tanks_and_temples/')
+        #call_subprocess_command('')
+        
+        
         os.chdir(parent_dir)
-        if st.spinner(text="colmap processing In progress"):
-            colmap_execution(ds_name=value, downsample_rate=5, scene_type=scene_type)
-            for i in os.listdir((datasets_dir + '/tanks_and_temples/' + value + '/' ).resolve()):
-                st.write('fetching the file details:  ' + str(i))
-        st.success('calibrated raw_images generated in ' +  videos_dir + value)
+        # if st.spinner(text="colmap processing In progress"):
+        #     colmap_execution(ds_name=value, downsample_rate=5, scene_type=scene_type)
+        #     for i in os.listdir((datasets_dir + '/tanks_and_temples/' + value + '/' ).resolve()):
+        #         st.write('fetching the file details:  ' + str(i))
+        # st.success('calibrated raw_images generated in ' +  videos_dir + value)
     if training_model:
         st.write("training stage and output")
         run_training_job(value,ds_rate=downsampling, experiment_name=value, group_name= value + "_group")
@@ -152,11 +167,7 @@ def run_visualization(mesh_name: str):
                                   up=[-0.0694, -0.9768, 0.2024])
         
     
-        
-        
     
-
-
 
 if __name__ == "__main__":
     main()

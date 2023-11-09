@@ -3,8 +3,7 @@ GROUP=${1}
 NAME=${2}
 OUTPUT_MESH=${3}
 
-CHECKPOINT=logs/${GROUP}/${NAME}/xxx.pt
-OUTPUT_MESH=xxx.ply
+CHECKPOINT=logs/${GROUP}/${NAME}/logs_${GROUP}.pt
 CONFIG=logs/${GROUP}/${NAME}/config.yaml
 RESOLUTION=2048
 BLOCK_RES=128

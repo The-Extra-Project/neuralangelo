@@ -54,14 +54,9 @@ WORKDIR /app/neuralangelo
 
 ## copying the dataset video along with the code to run the initial image surface reconstruction process
 
-#COPY ../datasets/  ./datasets/
 COPY ../projects/ ./projects/
 COPY ../third_party/colmap/scripts ./third_party/colmap/scripts
-
 COPY ../scripts/ ./scripts/
-
-COPY ../datasets/videos ./datasets/videos/
-COPY ../datasets/tanks_and_temples/Barn/ ./datasets/tanks_and_temples/Barn/
 
 RUN chmod +x ./scripts/run_initial_preprocessing.sh
 

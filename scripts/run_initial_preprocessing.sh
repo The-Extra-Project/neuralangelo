@@ -1,7 +1,9 @@
 #!/bin/bash
-SEQUENCE=${1}
+
+
+SEQUENCE=$1
 DOWNSAMPLE_RATE=$2
-SCENE_TYPE=${3}
+SCENE_TYPE=$3
 PATH_TO_VIDEO=/app/neuralangelo/datasets/videos/${SEQUENCE}.mp4
 TNT_PATH=/app/neuralangelo/datasets/tanks_and_temples/${SEQUENCE}/
 bash ./app/neuralangelo/projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
