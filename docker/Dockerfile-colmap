@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y \
     libqt5opengl5-dev \
     libcgal-dev \
     libceres-dev
+
 # headless servers
 RUN apt-get update && apt-get install -y \
     xvfb
@@ -55,14 +56,13 @@ WORKDIR /app/neuralangelo
 ## copying the dataset video along with the code to run the initial image surface reconstruction process
 
 COPY ../projects/ ./projects/
-COPY ../third_party/colmap/scripts ./third_party/colmap/scripts
+COPY ../third_party/colmap/ ./third_party/colmap/
 COPY ../scripts/ ./scripts/
 
-RUN chmod +x ./scripts/run_initial_preprocessing.sh
-
+RUN chmod +x ./projects/neuralangelo/scripts/*.sh
+RUN chmod +x ./scripts/*.sh
 FROM base as preprocessing
 
 COPY --from=base /app/neuralangelo /app/neuralangelo
-WORKDIR /
 
-#ENTRYPOINT [ "/app/neuralangelo/scripts/run_initial_preprocessing.sh"]
+WORKDIR /app/neuralangelo

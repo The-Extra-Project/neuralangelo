@@ -1,6 +1,6 @@
 # Neuralangelo-decentralised 
 This is the mofidied implementation of original **Neuralangelo** paper with significant changes.
-    - possiblity to run on various real-life datasets like [tanks-and-temples]().
+    - allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples]().
 
 
 
@@ -36,7 +36,8 @@ This implementation is to be solely used for running the compute operations for 
 > docker compose build up -d 
 ```
 
-2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ as following structure
+2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ as following structure.
+
 
 ```
 ./tanks_and_temples/

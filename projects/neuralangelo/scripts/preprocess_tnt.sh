@@ -13,8 +13,9 @@ echo "Download fixed poses for the given dataset"
 # TODO: only use them in case of generating the dataset if needed
 # gdown ${2}
 # gdown ${3}
-# mv Courthouse_COLMAP_SfM.log ${1}/Courthouse/Courthouse_COLMAP_SfM.log
-# mv Courthouse_trans.txt ${1}/Courthouse/Courthouse_trans.txt
+
+#mv Courthouse_COLMAP_SfM.log ${1}/Courthouse/Courthouse_COLMAP_SfM.log
+#mv Courthouse_trans.txt ${1}/Courthouse/Courthouse_trans.txt
 
 echo "Compute intrinsics, undistort images and generate json files. This may take a while"
-python3 ./app/neuralangelo/projects/neuralangelo/scripts/convert_tnt_to_json.py --tnt_path ${1}
+python3 ./projects/neuralangelo/scripts/convert_tnt_to_json.py --tnt_path ${1}
