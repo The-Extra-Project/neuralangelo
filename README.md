@@ -1,7 +1,6 @@
 # Neuralangelo-decentralised 
 This is the mofidied implementation of original **Neuralangelo** paper with significant changes.
-    - allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples]().
-
+    - Allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples]().
 
 
 
@@ -23,7 +22,9 @@ The code is built upon the Imaginaire library from the Deep Imagination Research
 
 
 
-This implementation is to be solely used for running the compute operations for non commercial demonstration purposes only, For business inquiries, please submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
+This implementation is to be solely used for running the compute operations for non commercial demonstration purposes only,
+
+ For business  deployment, please contact the authors and submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
 
 --------------------------------------
 
@@ -36,8 +37,12 @@ This implementation is to be solely used for running the compute operations for 
 > docker compose build up -d 
 ```
 
-2. You need to download the [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=) into the dataset/tanks_and_dataset/ as following structure.
+2. You need to download the 
+- [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=)   into the dataset/tanks_and_dataset/ 
+- and  videos in dataset/videos
+- for downloading all te videos in once you can deploy the 
 
+and as following structure:
 
 ```
 ./tanks_and_temples/
@@ -100,15 +105,14 @@ This implementation is to be solely used for running the compute operations for 
 3. install the bacalau and streamlit locally
 
 4. Then setup the streamlit application: 
-    - streamlit run dashboard/app.py    
+    - streamlit run dashboard/app.py  
+    - select the dataset and the downsampling on which you want to run the training (lower value thus better but still takes enormous time)
 
 
 --------------------------------------
 
-## Data preparation
-Please refer to [Data Preparation](DATA_PROCESSING.md) for step-by-step instructions.  
-We assume known camera poses for each extracted frame from the video.
-The code uses the same json format as [Instant NGP](https://github.com/NVlabs/instant-ngp).
+##  About Data preparation:
+Please refer to [Data Preparation](DATA_PROCESSING.md) for understanding the various scripts and their actions .  for our concern we use tanks_and_temples dataset video. the generated json format as [Instant NGP](https://github.com/NVlabs/instant-ngp).
 
 --------------------------------------
 

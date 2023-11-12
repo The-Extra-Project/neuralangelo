@@ -3,10 +3,14 @@ from dataset.tanks_temples_dataset import intermediate_list , advanced_list, tra
 from subprocess import check_call
 from pathlib import Path
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, run
+from collections import deque
 import asyncio
-
+import open3d as o3d
 def call_subprocess_command(command):
+    """
+    command: its the command that you want to run via the container scrip. 
+    """
     try:
         command = Popen(command, stdout=PIPE, shell=True)      
         output, error = command.communicate() 
@@ -20,29 +24,38 @@ def call_subprocess_command(command):
     
     return command
 
+def stream_output(command: str) -> None:
+    """
+    Streams the output of docker commands linewise.
 
-def stream_output(command):
+    Args:
+        command: The docker command to stream the output of.
     """
-    fetches the output of docker commands linewise.
-    """
+    output = deque(maxlen=20)
+    
     try:
-        command = subprocess.Popen(command, stdout=subprocess.PIPE, stderr= subprocess.PIPE, shell=True)
-        output_lines = []
-        for line in command.stdout:
-            output_lines.append(line.decode('utf-8'))
-        command.stdout.close()
-        command.wait()
+        with Popen(command,stdout=PIPE,stderr=PIPE,shell=True) as process:
+            while True:
+                line = process.stdout.readline()
+                if not line:
+                    break
+                line = line.decode("utf-8")
+                
+                st.write(line)
+                
+        # Wait for the process to finish
+        process.wait()
 
-        if output_lines:
-            st.success(output_lines)
-        else:
-            st.error("No output from command")
+        # If there are any errors, raise them
+        if process.returncode != 0:
+            raise Exception(f"Command failed: {command}")
     except Exception as ex:
-        st.error(f"exception occured at {command}")
+        print(f"Exception occurred while streaming output: {ex}")
 
     
 
 def main():
+    #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
     st.title("neuralangelo demo")
     dataset_list = []
     gdrive_ids_mapping = {}
@@ -53,7 +66,6 @@ def main():
         dataset_list.append(key)
         
     form = st.form("neuralangelo dataset params")
-    
     scene_type = form.selectbox("scene type", options=["outdoor","indoor","object"])
     value = form.selectbox("dataset category", options= dataset_list)
     downsampling = form.text_input(label="number of frames that you want to resample", value=2)
@@ -64,6 +76,7 @@ def main():
     allignment_images = form.form_submit_button("colmap image allignment")
     training_model = form.form_submit_button("neuralangelo training")
     mesh_generation = form.form_submit_button("mesh generation")    
+    final_3D = form.form_submit_button("output vizualization")
     
     
     current_dir =  Path(__file__).parent
@@ -74,26 +87,29 @@ def main():
     if submitted:
         st.text("preprocessing the given dataset")
         colmap_execution(value, downsampling, scene_type)
-        
-        # if st.spinner(text="colmap processing In progress"):
-        #     colmap_execution(ds_name=value, downsample_rate=5, scene_type=scene_type)
-        #     for i in os.listdir((datasets_dir + '/tanks_and_temples/' + value + '/' ).resolve()):
-        #         st.write('fetching the file details:  ' + str(i))
-        # st.success('calibrated raw_images generated in ' +  videos_dir + value)
+        st.text("the images along with json data and yaml files are preprocessed")
+    
     if training_model:
+        #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
+        
         st.write("training stage and output")
         run_training_job(value,ds_rate=downsampling, experiment_name=value, group_name= value + "_group")
         st.write("finished with the trained weight and checkpoints stored")
+        
 
     if mesh_generation:
         st.write("and the pointcloud generation phase")
         run_mesh_extraction(group_name=value,output_name= "output" + value,mesh= value + "ply" )
-        
+      
+    if final_3D:
+            st.write("result of neuralangelo model extraction")
+            run_visualization('../datasets/tanks_and_temples/Barn/Barn.ply')
         
 
 def dataset_parse(selected_group):
     """
     fetches the dataset selected by the user and fetches the video/ images and returns its relative path
+    TODO: only used if you want to download all the videos (around 40GB's) in your localhost.
     """
     try:
         os.mkdir( os.getcwd() + "/datasets/")
@@ -104,20 +120,31 @@ def dataset_parse(selected_group):
 ## these functions are for running the pipeline in sequential version:
 
 
-def colmap_execution(ds_name: str, downsample_rate: int,   scene_type: str):
+def colmap_execution(ds_name: str, downsample_rate: int,scene_type: str):
     """
     generates the downsampled images from video ds and runs the calibration.
   
     """
     try:
         video_path = './datasets/videos/' + ds_name + '.mp4'
-        colmap_output = stream_output(["docker run neuralangelo-colmap " + ds_name  + " " + video_path +  " " + str(downsample_rate) + " " + scene_type])
-
+        stream_output([" bash ../scripts/run_initial_preprocessing.sh " + ds_name  + " " + downsample_rate +  " " + scene_type], )
+        
+        ## now copy the outputs 
+        
+        
+        
     except Exception as e:
-        st.write("inside colmap execution" + str(e))
+        st.error("inside colmap execution" + str(e))
 
 
 def  run_training_job(sequence: str, ds_rate:int, experiment_name: str, group_name: str):
+
+    stream_output(['docker', 'run', '-d', '-t' 'neuralangelo-neuralangelo'])
+
+    ## copying the output results and the config files from the preprocessing  stage to the neuralangelo container.
+    #stream_output([ 'docker' + 'cp' + './datasets/' + '' ])../datasets/t
+
+    
     try:
         ## copying the previous results from colmap dataset.
         command_copy = Popen('docker cp neuralangelo-colmap:/app/neuralangelo/'+ ' neuralangelo:/app/neuralangelo',stdout=PIPE, shell=True)
@@ -158,17 +185,24 @@ def run_mesh_extraction(group_name, output_name, mesh):
     
 def run_visualization(mesh_name: str):
     """
-    mesh_name: its the output ply file generated after running the output
-    
+    mesh_name: its the output ply file generated after generation by the model image.
     """
 
-    ply_point_cloud = o3d.io.read_point_cloud(mesh_name)
-    o3d.visualization([ply_point_cloud],
+
+
+    o3d.visualization.webrtc_server.enable_webrtc()
+    
+    ply_point_cloud = o3d.io.read_point_cloud(mesh_name)    
+    print(ply_point_cloud)
+    
+    st.write(o3d.visualization.draw_geometries([ply_point_cloud],
                       zoom=0.3412,
                                   front=[0.4257, -0.2125, -0.8795],
                                   lookat=[2.6172, 2.0475, 1.532],
-                                  up=[-0.0694, -0.9768, 0.2024])
-        
+                                  up=[-0.0694, -0.9768, 0.2024]))
+    
+    
+    
     
     
 

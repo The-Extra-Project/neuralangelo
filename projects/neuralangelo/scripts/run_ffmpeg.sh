@@ -10,7 +10,7 @@
 
 # usage: run_ffmpeg.sh <sequence_name> <full_video_path> <downsample_rate>
 
-data_path=datasets/tanks_and_temples/${1}/${1}_ds${3}
+data_path=datasets/tanks_and_temples/${1}/
 image_path=${data_path}/images_raw
 mkdir -p ${image_path}
 ffmpeg -i ${2} -vf "select=not(mod(n\,$3))" -vsync vfr -q:v 10 ${image_path}/%06d.jpg
