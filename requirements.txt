@@ -1,4 +1,5 @@
 addict
+git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 gdown
 gpustat
 icecream

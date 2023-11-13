@@ -7,14 +7,13 @@ PATH_TO_VIDEO=./datasets/videos/${SEQUENCE}.mp4
 TNT_PATH=./datasets/${SEQUENCE}/
 
 
-echo "run the container" 
+echo "run the container \n" 
 
-docker run  -d -t neuralangelo-colmap
+docker run  -d -t neuralangelo-colmap 
 container_id=$(docker ps -al | grep "neuralangelo-colmap" | awk '{print $1}')
 
 
-echo "copying all the dataset files from local folder to the container" + '\n'
-
+echo "copying the video dataset from local to container \n"
 
 docker cp ../datasets/  ${container_id}:/app/neuralangelo/datasets/ 
 
@@ -22,14 +21,14 @@ echo "checking the videos availble"
 
 docker exec -it ${container_id} ls ./datasets/videos
 
-echo "running the initial commands on the docker container" + \n
+echo "running the initial commands on the docker container  \n"
 
 docker exec -it ${container_id} bash ./projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
 
 DATA_PATH=/app/neuralangelo/datasets/${SEQUENCE}/${SEQUENCE}_ds${DOWNSAMPLE_RATE}
 
 ## NOTE: in case for running more comprehensive evaluation, its preferable
-echo "now running the tnt preprocessing dataset" + \n
+echo "now running the tnt preprocessing dataset  + \n" 
 
 docker exec -it ${container_id} bash  ./app/neuralangelo/projects/neuralangelo/scripts/run_colmap.sh  ${DATA_PATH}
 

@@ -27,7 +27,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 def generate_config(args):
     cfg = Dict()
     cfg._parent_ = "projects/neuralangelo/configs/base.yaml"
-    num_images = len(os.listdir(os.path.join(args.data_dir, "images")))
+    num_images = len(os.listdir(os.path.join(args.data_dir, "image")))
     # model cfg
     if args.auto_exposure_wb:
         cfg.data.num_images = num_images
@@ -53,7 +53,7 @@ def generate_config(args):
     # data config
     cfg.data.type = "projects.neuralangelo.data"
     cfg.data.root = args.data_dir
-    img = Image.open(os.path.join(args.data_dir, "images", os.listdir(os.path.join(args.data_dir, "images"))[0]))
+    img = Image.open(os.path.join(args.data_dir, "image", os.listdir(os.path.join(args.data_dir, "image"))[0]))
     w, h = img.size
     cfg.data.train.image_size = [h, w]
     short_size = args.val_short_size

@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------
 
 # usage: dtu_download.sh <path_to_dtu>
-
+#sudo apt-get install curl unzip
 echo "Download DTU data"
 mkdir -p "${1}"
 curl -L -o data.zip https://www.dropbox.com/sh/w0y8bbdmxzik3uk/AAAaZffBiJevxQzRskoOYcyja?dl=1

@@ -7,9 +7,11 @@ from subprocess import Popen, PIPE, run
 from collections import deque
 import asyncio
 import open3d as o3d
+
 def call_subprocess_command(command):
     """
-    command: its the command that you want to run via the container scrip. 
+    function to output the result with output as the block.
+    command: its the command that you want to run via the container script. 
     """
     try:
         command = Popen(command, stdout=PIPE, shell=True)      
@@ -26,8 +28,7 @@ def call_subprocess_command(command):
 
 def stream_output(command: str) -> None:
     """
-    Streams the output of docker commands linewise.
-
+    Streams the output of docker commands linewise for an executed runtime command.
     Args:
         command: The docker command to stream the output of.
     """
@@ -42,7 +43,6 @@ def stream_output(command: str) -> None:
                 line = line.decode("utf-8")
                 
                 st.write(line)
-                
         # Wait for the process to finish
         process.wait()
 
@@ -52,28 +52,46 @@ def stream_output(command: str) -> None:
     except Exception as ex:
         print(f"Exception occurred while streaming output: {ex}")
 
-    
-
-def main():
-    #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
-    st.title("neuralangelo demo")
-    dataset_list = []
+def listing_tnt_dataset( gdrive_ids_mapping: dict) -> list:
+    list_params = []
     gdrive_ids_mapping = {}
     for key,value in id_download_dict.items():
         if key.split(".")[1] == "mp4":
             gdrive_ids_mapping[key.split(".")[0]] = value
     for key in  intermediate_list + advanced_list + training_list:
-        dataset_list.append(key)
+        list_params.append(key)
+    
+    return list_params
+
+def listing_dtu_dataset() -> list: 
+    output = []
+    for folder in os.listdir(f"../datasets/dtu"):
+        output.append(folder)
         
+    return output
+
+def main():
+    #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
+    st.title("neuralangelo demo")
+    gdrive_ids_mapping = {}
+
+
+    with st.sidebar():
+        analysis_image = st.button("analyzing photos analysis")
+    
     form = st.form("neuralangelo dataset params")
+    dt_type = form.selectbox("dataset category", options=["small-objects", "real-scenes"])
+    if dt_type == "small-objects":
+        dataset_list = listing_tnt_dataset(gdrive_ids_mapping)
+    elif dt_type == "real-scenes":
+      dataset_list = listing_dtu_dataset()
+        
     scene_type = form.selectbox("scene type", options=["outdoor","indoor","object"])
     value = form.selectbox("dataset category", options= dataset_list)
     downsampling = form.text_input(label="number of frames that you want to resample", value=2)
     
-    mesh_name = 'output_' + value
-    
+    upload_video = form.file_uploader("uploading the video", type=["mp4", "mov"])
     submitted = form.form_submit_button("colmap calibration/analysis")
-    allignment_images = form.form_submit_button("colmap image allignment")
     training_model = form.form_submit_button("neuralangelo training")
     mesh_generation = form.form_submit_button("mesh generation")    
     final_3D = form.form_submit_button("output vizualization")
@@ -84,26 +102,30 @@ def main():
     datasets_dir = ( parent_dir / 'datasets/').resolve()
     videos_dir = (datasets_dir/ 'videos/').resolve()
 
-    if submitted:
+
+    if upload_video is not None:
+        
+        
+
+
+    if submitted is not None:
         st.text("preprocessing the given dataset")
         colmap_execution(value, downsampling, scene_type)
         st.text("the images along with json data and yaml files are preprocessed")
     
-    if training_model:
-        #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
-        
+    if training_model is not None:
         st.write("training stage and output")
         run_training_job(value,ds_rate=downsampling, experiment_name=value, group_name= value + "_group")
         st.write("finished with the trained weight and checkpoints stored")
         
 
-    if mesh_generation:
+    if mesh_generation is not None:
         st.write("and the pointcloud generation phase")
-        run_mesh_extraction(group_name=value,output_name= "output" + value,mesh= value + "ply" )
+        run_mesh_extraction(group_name=value,output_name= "output" + value,mesh= value + ".ply" )
       
-    if final_3D:
-            st.write("result of neuralangelo model extraction")
-            run_visualization('../datasets/tanks_and_temples/Barn/Barn.ply')
+    if final_3D is not None:
+        st.write("result of neuralangelo model extraction")
+        run_visualization('../datasets/tanks_and_temples/Barn/Barn.ply')
         
 
 def dataset_parse(selected_group):
@@ -119,17 +141,16 @@ def dataset_parse(selected_group):
 
 ## these functions are for running the pipeline in sequential version:
 
-
-def colmap_execution(ds_name: str, downsample_rate: int,scene_type: str):
+def colmap_execution(ds_name: str, downsample_rate: int,scene_type: str, video_upload_str: str):
     """
-    generates the downsampled images from video ds and runs the calibration.
-  
+    generates the downsampled images from video (defined from other datasets or users own video).
+    
     """
     try:
-        video_path = './datasets/videos/' + ds_name + '.mp4'
-        stream_output([" bash ../scripts/run_initial_preprocessing.sh " + ds_name  + " " + downsample_rate +  " " + scene_type], )
         
-        ## now copy the outputs 
+        stream_output([" bash ../scripts/run_initial_preprocessing.sh " + ds_name  + " " + downsample_rate +  " " + scene_type] )
+        
+        ## now copy the outputs        
         
         
         
@@ -187,12 +208,10 @@ def run_visualization(mesh_name: str):
     """
     mesh_name: its the output ply file generated after generation by the model image.
     """
-
-
-
     o3d.visualization.webrtc_server.enable_webrtc()
     
     ply_point_cloud = o3d.io.read_point_cloud(mesh_name)    
+    
     print(ply_point_cloud)
     
     st.write(o3d.visualization.draw_geometries([ply_point_cloud],

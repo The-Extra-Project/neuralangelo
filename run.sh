@@ -13,6 +13,7 @@ echo "running the initial run_ffmpeg to sequence the photos from videos"
 
 bash app/neuralangelo/projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
 
+
 DATA_PATH=./datasets/${SEQUENCE}_ds${DOWNSAMPLE_RATE}
 
 if [ ! -d "./datasets/tanks_and_temples/" ]; then

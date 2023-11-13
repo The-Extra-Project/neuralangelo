@@ -1,8 +1,11 @@
 #!/bin/bash
 
+
+
+
 echo "starting the training of the model on the raw images"
-EXPERIMENT=${1}
-GROUP=${2}
+EXPERIMENT=$1
+GROUP=$2
 NAME=$SEQUENCE
 CONFIG=projects/neuralangelo/configs/custom/${EXPERIMENT}.yaml
 GPUS=1  

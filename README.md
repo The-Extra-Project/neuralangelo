@@ -3,28 +3,12 @@ This is the mofidied implementation of original **Neuralangelo** paper with sign
     - Allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples]().
 
 
-
-## Credits:
-
-[Zhaoshuo Li](https://mli0603.github.io/),
-[Thomas Müller](https://tom94.net/),
-[Alex Evans](https://research.nvidia.com/person/alex-evans),
-[Russell H. Taylor](https://www.cs.jhu.edu/~rht/),
-[Mathias Unberath](https://mathiasunberath.github.io/),
-[Ming-Yu Liu](https://mingyuliu.net/),
-[Chen-Hsuan Lin](https://chenhsuanlin.bitbucket.io/)  
-IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2023
-
-### [Project page](https://research.nvidia.com/labs/dir/neuralangelo/) | [Paper](https://arxiv.org/abs/2306.03092/) | [Colab notebook](https://colab.research.google.com/drive/13u8DX9BNzQwiyPPCB7_4DbSxiQ5-_nGF)
-
-The code is built upon the Imaginaire library from the Deep Imagination Research Group at NVIDIA.  
-
-
-
+# note:
+This is the demo version. actual version is impleented in [geospatial pipeline](https://github.com/The-Extra-Project/geospatial-pipelines/tree/photogrammetry-pipeline). 
 
 This implementation is to be solely used for running the compute operations for non commercial demonstration purposes only,
 
- For business  deployment, please contact the authors and submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
+For business  deployment, please contact the authors and submit the [NVIDIA research licensing form](https://www.nvidia.com/en-us/research/inquiries/).
 
 --------------------------------------
 
@@ -40,9 +24,9 @@ This implementation is to be solely used for running the compute operations for 
 2. You need to download the 
 - [trainingdata](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?resourcekey=)   into the dataset/tanks_and_dataset/ 
 - and  videos in dataset/videos
-- for downloading all te videos in once you can deploy the 
+- for downloading all the videos for which you want to generate the result.
 
-and as following structure:
+And set it as following structure:
 
 ```
 ./tanks_and_temples/
@@ -102,13 +86,11 @@ and as following structure:
 │   ├── Truck_mapping_reference.txt
 │   └── Truck_trans.txt
 ```
-3. install the bacalau and streamlit locally
+3. Install the bacalau and streamlit locally
 
 4. Then setup the streamlit application: 
     - streamlit run dashboard/app.py  
     - select the dataset and the downsampling on which you want to run the training (lower value thus better but still takes enormous time)
-
-
 --------------------------------------
 
 ##  About Data preparation:
