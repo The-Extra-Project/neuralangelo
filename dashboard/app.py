@@ -1,12 +1,15 @@
 import streamlit as st
-from dataset.tanks_temples_dataset import intermediate_list , advanced_list, training_list, id_download_dict
+from dataset.tanks_temples_dataset import intermediate_list, advanced_list, training_list, id_download_dict
 from subprocess import check_call
 from pathlib import Path
 import os
-from subprocess import Popen, PIPE, run
+from subprocess import Popen, PIPE
 from collections import deque
 import asyncio
 import open3d as o3d
+import logging
+
+logging.setLoggerClass
 
 def call_subprocess_command(command):
     """
@@ -36,14 +39,15 @@ def stream_output(command: str) -> None:
     
     try:
         with Popen(command,stdout=PIPE,stderr=PIPE,shell=True) as process:
-            while True:
+            while len(output) <= 20:
                 line = process.stdout.readline()
                 if not line:
                     break
                 line = line.decode("utf-8")
-                
+                output.append(line)
                 st.write(line)
         # Wait for the process to finish
+        output.clear()
         process.wait()
 
         # If there are any errors, raise them
@@ -71,16 +75,13 @@ def listing_dtu_dataset() -> list:
     return output
 
 def main():
-    #subprocess.run(['docker', 'run', '-d','-t' , 'neuralangelo-colmap'])
     st.title("neuralangelo demo")
     gdrive_ids_mapping = {}
-
-
-    with st.sidebar():
-        analysis_image = st.button("analyzing photos analysis")
+    # with st.sidebar():
+    #     analysis_image = st.button("analyzing photos analysis")
     
     form = st.form("neuralangelo dataset params")
-    dt_type = form.selectbox("dataset category", options=["small-objects", "real-scenes"])
+    dt_type = form.selectbox("dataset category", options=["small-objects", "real-scenes", "your-video"])
     if dt_type == "small-objects":
         dataset_list = listing_tnt_dataset(gdrive_ids_mapping)
     elif dt_type == "real-scenes":
@@ -89,7 +90,6 @@ def main():
     scene_type = form.selectbox("scene type", options=["outdoor","indoor","object"])
     value = form.selectbox("dataset category", options= dataset_list)
     downsampling = form.text_input(label="number of frames that you want to resample", value=2)
-    
     upload_video = form.file_uploader("uploading the video", type=["mp4", "mov"])
     submitted = form.form_submit_button("colmap calibration/analysis")
     training_model = form.form_submit_button("neuralangelo training")
@@ -102,28 +102,22 @@ def main():
     datasets_dir = ( parent_dir / 'datasets/').resolve()
     videos_dir = (datasets_dir/ 'videos/').resolve()
 
-
-    if upload_video is not None:
-        
-        
-
-
-    if submitted is not None:
+    if submitted:
         st.text("preprocessing the given dataset")
         colmap_execution(value, downsampling, scene_type)
         st.text("the images along with json data and yaml files are preprocessed")
     
-    if training_model is not None:
+    if training_model:
         st.write("training stage and output")
         run_training_job(value,ds_rate=downsampling, experiment_name=value, group_name= value + "_group")
         st.write("finished with the trained weight and checkpoints stored")
         
 
-    if mesh_generation is not None:
+    if mesh_generation:
         st.write("and the pointcloud generation phase")
         run_mesh_extraction(group_name=value,output_name= "output" + value,mesh= value + ".ply" )
       
-    if final_3D is not None:
+    if final_3D:
         st.write("result of neuralangelo model extraction")
         run_visualization('../datasets/tanks_and_temples/Barn/Barn.ply')
         
@@ -141,18 +135,15 @@ def dataset_parse(selected_group):
 
 ## these functions are for running the pipeline in sequential version:
 
-def colmap_execution(ds_name: str, downsample_rate: int,scene_type: str, video_upload_str: str):
+def colmap_execution(ds_name: str, downsample_rate: int,scene_type: str):
     """
     generates the downsampled images from video (defined from other datasets or users own video).
     
     """
     try:
-        
-        stream_output([" bash ../scripts/run_initial_preprocessing.sh " + ds_name  + " " + downsample_rate +  " " + scene_type] )
+        stream_output(["bash ../scripts/run_initial_preprocessing.sh " + ds_name  + " " + downsample_rate +  " " + scene_type] )
         
         ## now copy the outputs        
-        
-        
         
     except Exception as e:
         st.error("inside colmap execution" + str(e))
