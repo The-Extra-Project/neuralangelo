@@ -1,0 +1,3 @@
+flytekitplugins-bacalhau
+bacalhau-sdk
+boto3
