@@ -10,7 +10,7 @@
 
 # usage: preprocess.sh <sequence_name> <full_video_path> <downsample_rate> <scene_type> <dataset_path>
 #!/bin/bash
-data_path=./datasets/${1}_ds${3}
+data_path=./datasets/tanks_and_temples/${1}/${1}_ds${3}
 
 bash projects/neuralangelo/scripts/run_ffmpeg.sh ${1} ${2} ${3}
 #bash projects/neuralangelo/scripts/run_colmap.sh ${data_path}

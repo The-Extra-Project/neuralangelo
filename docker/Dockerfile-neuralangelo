@@ -1,8 +1,9 @@
 # docker build -f docker/Dockerfile-neuralangelo -t chenhsuanlin/neuralangelo:23.04-py3 .
 # docker push chenhsuanlin/neuralangelo:23.04-py3
 
-FROM nvcr.io/nvidia/pytorch:23.04-py3
-ARG DEBIAN_FRONTEND=noninteractive
+FROM nvcr.io/nvidia/pytorch:23.04-py3 as build
+
+ARG DEBIAN_FRONTEND=noninteractive 
 
 # Install basics
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -30,9 +31,38 @@ RUN pip install --upgrade \
 
 COPY ../requirements.txt requirements.txt
 ARG FORCE_CUDA=1
-ARG TCNN_CUDA_ARCHITECTURES=70,72,75,80,86
+ARG TCNN_CUDA_ARCHITECTURES=86
 RUN pip install --upgrade -r requirements.txt
+ARG TCNN_CUDA_ARCHITECTURES=86
+
+## reinstalling the python to the latest version ()
+
+WORKDIR /workspaces/app/neuralangelo
 
 
+##  transferring the scripts and code related to colmap reconstruction pipeline.
+COPY ../projects/ ./projects/
+COPY ../third_party/colmap/ ./third_party/colmap/
+COPY ../imaginaire ./imaginaire/
+COPY ../train.py train.py
+COPY ../neuralangelo.yaml neuralangelo.yaml 
+## resolving the error related to incompatiblity of the 4.8.0.74
+RUN  pip install opencv-python-headless
 
-## now 
+ENV TCNN_CUDA_ARCHITECTURES=86
+
+RUN chmod +x ./projects/neuralangelo/scripts/*.sh
+
+RUN mkdir -p ~/miniconda3 && wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh \
+&& bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3 \
+&& rm -rf ~/miniconda3/miniconda.sh && ~/miniconda3/bin/conda init bash \
+&& cd /workspaces/app/neuralangelo && ~/miniconda3/bin/conda env create --file neuralangelo.yaml && ~/miniconda3/bin/conda activate neuralangelo
+
+FROM build as run
+
+COPY --from=build /workspaces/app/neuralangelo /workspaces/app/neuralangelo
+
+WORKDIR /workspaces/app/neuralangelo
+
+## now running the container eventually to copy the datasets to be executed and run the output
+

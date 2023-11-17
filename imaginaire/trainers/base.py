@@ -225,7 +225,7 @@ class BaseTrainer(object):
         if self.cfg.metrics_epoch is None:
             self.cfg.metrics_epoch = self.cfg.checkpoint.save_epoch
 
-    def init_wandb(self, cfg, wandb_id=None, project="", run_name=None, mode="online", resume="allow", use_group=False):
+    def init_wandb(self, cfg, wandb_id=None, project="frontier-tech", run_name=None, mode="online", resume="allow", use_group=False):
         r"""Initialize Weights & Biases (wandb) logger.
 
         Args:

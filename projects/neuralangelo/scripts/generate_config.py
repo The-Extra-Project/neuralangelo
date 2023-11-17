@@ -63,8 +63,8 @@ def generate_config(args):
     # export cfg
     cfg_fname = os.path.join(dir_path, "projects/neuralangelo/configs", f"custom/{args.sequence_name}.yaml")
     with open(cfg_fname, "w") as file:
-        yaml.safe_dump(cfg.to_dict(), file, default_flow_style=False, indent=4)
-    print("Config generated to file:", cfg_fname)
+        yaml.dump(cfg.to_dict(), file, default_flow_style=False, indent=4)
+    #print("Config generated to file:", cfg_fname)
     return
 
 

@@ -1,3 +1,4 @@
 flytekitplugins-bacalhau
 bacalhau-sdk
 boto3
+python-dotenv

@@ -49,20 +49,29 @@ RUN pip install \
     pyyaml \
     trimesh
 
+
 RUN rm -rf ./colmap/
 
 WORKDIR /app/neuralangelo
 
-## copying the dataset video along with the code to run the initial image surface reconstruction process
-
+##  transferring the scripts and code related to colmap reconstruction pipeline.
 COPY ../projects/ ./projects/
 COPY ../third_party/colmap/ ./third_party/colmap/
 COPY ../scripts/ ./scripts/
+COPY ../imaginaire ./imaginaire
+
+
+ENV TCNN_CUDA_ARCHITECTURES=86
+
 
 RUN chmod +x ./projects/neuralangelo/scripts/*.sh
 RUN chmod +x ./scripts/*.sh
+
+
 FROM base as preprocessing
 
 COPY --from=base /app/neuralangelo /app/neuralangelo
 
 WORKDIR /app/neuralangelo
+
+ENTRYPOINT [ "./scripts/run_dataset_pipeline.sh" ]

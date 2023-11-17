@@ -1,9 +1,8 @@
 # Neuralangelo-decentralised 
 This is the mofidied implementation of original **Neuralangelo** paper with significant changes.
-    - Allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples]().
+    - Allows to run training the mesh regeneration on various real-life video / photo scans like [tanks-and-temples](), [DTU]() etc.
 
-
-# note:
+# Note:
 This is the demo version. actual version is impleented in [geospatial pipeline](https://github.com/The-Extra-Project/geospatial-pipelines/tree/photogrammetry-pipeline). 
 
 This implementation is to be solely used for running the compute operations for non commercial demonstration purposes only,
@@ -13,7 +12,7 @@ For business  deployment, please contact the authors and submit the [NVIDIA rese
 --------------------------------------
 
 ## Setup
-
+###  1. Running 
 
 1. Build both the docker images which runs the preprocessing commands.
 

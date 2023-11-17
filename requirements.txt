@@ -37,4 +37,5 @@ streamlit
 python-dotenv
 open3d
 numpy
+opencv-python==4.8.1.78
 matplotlib
