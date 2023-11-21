@@ -42,7 +42,7 @@ def create_init_files(pinhole_dict_file, db_file, out_dir):
     images_line_template = '{image_id} {qw} {qx} {qy} {qz} {tx} {ty} {tz} {camera_id} {image_name}\n\n'
 
     for img_name in pinhole_dict:
-        # w, h, fx, fy, cx, cy, qvec, t
+        # w, h, fx, fy, cx, cy, qvec,
         params = pinhole_dict[img_name]
         w = params[0]
         h = params[1]
@@ -60,17 +60,35 @@ def create_init_files(pinhole_dict_file, db_file, out_dir):
                                                image_name=img_name)
         template[img_name] = (cam_line, img_line)
 
+    print("fetching the allignment data:")
+    
+    # for iterator, value in template.items():
+    #     print('{}: {}'.format(iterator,value))
+
     # read database
     db = COLMAPDatabase.connect(db_file)
     table_images = db.execute("SELECT * FROM images")
+    # values = table_images.fetchall()    
+    
+    # for iterator, value in values.items():
+    #     print('{}: {}'.format(iterator,value))
+    
     img_name2id_dict = {}
     for row in table_images:
         img_name2id_dict[row[1]] = row[0]
 
     cameras_txt_lines = [template[img_name][0].format(camera_id=1)]
     images_txt_lines = []
-    for img_name, img_id in img_name2id_dict.items():
-        image_line = template[img_name][1].format(image_id=img_id, camera_id=1)
+
+    
+    for img_name, img_id in img_name2id_dict.items():  
+        if img_name in template:
+            image_line = template[img_name][0].format(image_id=img_id, camera_id=1)
+        else:
+            print(f"Warning: Image '{img_name}' is not found in the template dictionary. Skipping...")
+            continue
+
+            
         images_txt_lines.append(image_line)
 
     with open(os.path.join(out_dir, 'cameras.txt'), 'w') as fp:

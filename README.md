@@ -40,50 +40,11 @@ And set it as following structure:
 │   ├── images_raw
 │   ├── pinhole_dict.json
 │   └── sparse
-├── Caterpillar
-│   ├── Caterpillar.json
-│   ├── Caterpillar.ply
-│   ├── Caterpillar_COLMAP.ply
-│   ├── Caterpillar_COLMAP_SfM.log
-│   ├── Caterpillar_mapping_reference.txt
-│   └── Caterpillar_trans.txt
-├── Church
-│   ├── Church.json
-│   ├── Church.ply
-│   ├── Church_COLMAP.ply
-│   ├── Church_COLMAP_SfM.log
-│   ├── Church_COLMAP_SfM_ff.log
-│   ├── Church_mapping_reference.txt
-│   └── Church_trans.txt
-├── Courthouse
-│   ├── Courthouse.json
-│   ├── Courthouse.ply
-│   ├── Courthouse_COLMAP.ply
-│   ├── Courthouse_COLMAP_SfM.log
-│   ├── Courthouse_COLMAP_SfM_ff.log
-│   ├── Courthouse_mapping_reference.txt
-│   └── Courthouse_trans.txt
-├── Ignatius
-│   ├── Ignatius.json
-│   ├── Ignatius.ply
-│   ├── Ignatius_COLMAP.ply
-│   ├── Ignatius_COLMAP_SfM.log
-│   ├── Ignatius_mapping_reference.txt
-│   └── Ignatius_trans.txt
-├── Meetingroom
-│   ├── Meetingroom.json
-│   ├── Meetingroom.ply
-│   ├── Meetingroom_COLMAP.ply
-│   ├── Meetingroom_COLMAP_SfM.log
-│   ├── Meetingroom_mapping_reference.txt
-│   └── Meetingroom_trans.txt
-├── Truck
-│   ├── Truck.json
-│   ├── Truck.ply
-│   ├── Truck_COLMAP.ply
-│   ├── Truck_COLMAP_SfM.log
-│   ├── Truck_mapping_reference.txt
-│   └── Truck_trans.txt
+├─ Videos
+│   ├── Barn.mp4
+│   ├── Meetingroom.mp4 (and so on)
+
+
 ```
 3. Install the bacalau and streamlit locally
 

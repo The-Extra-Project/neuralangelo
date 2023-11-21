@@ -1,10 +1,5 @@
 #!/bin/bash
 
-SEQUENCE=$1
-DOWNSAMPLE_RATE=$2
-SCENE_TYPE=$3
-DATA_TYPE=$4
-
 function run_DTU_pipeline() {
 
 ##$1 is the directory for storing the dtu datasets (which is full dir like datasets like dtu_scan24)
@@ -46,9 +41,6 @@ docker exec -it ${container_id} torchrun --nproc_per_node=1 train.py \
     --optim.sched.two_steps=[12000,16000] \
     --optim.params.lr=${2} \
 
-
-
-
 echo "Training complete, storing the checkpoint file and running the torch output"
 
 mesh_fname=f"logs/${1}/mesh.ply"
@@ -70,9 +62,7 @@ function run_tnt_pipeline() {
 ##$1 is the name of the tnt dataset that we want to train 
 ##$2 is the downsampling rate that you want to define 
 ##$3 is the parameter for nature of the mapping (indoor,outdoor, object)
-
-PATH_TO_VIDEO=../datasets/videos/${1}.mp4
-
+PATH_TO_VIDEO=$pwd/../datasets/videos/${1}.mp4
 docker run  -d -t neuralangelo-colmap
 
 container_id=$(docker ps -al | grep "neuralangelo-colmap" | awk '{print $1}')

@@ -1,5 +1,5 @@
 addict
-git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+#git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 gdown
 gpustat
 icecream
@@ -39,3 +39,4 @@ open3d
 numpy
 opencv-python==4.8.1.78
 matplotlib
+bacalhau-sdk

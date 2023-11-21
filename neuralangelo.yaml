@@ -24,3 +24,4 @@ dependencies:
   - torchvision
   - pip:
     - -r requirements.txt
+    - -r dashboard/requirements.txt
